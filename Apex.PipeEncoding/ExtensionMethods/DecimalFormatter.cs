@@ -57,7 +57,7 @@ namespace Apex.PipeEncoding {
             }
         }
 
-        public static async ValueTask<decimal?> ReadNullableDoubleFromString(this PipeReader reader) {
+        public static async ValueTask<decimal?> ReadNullableDecimalFromString(this PipeReader reader) {
             if (!await reader.ReadBool().ConfigureAwait(false)) return null;
             return await reader.ReadDecimalFromString().ConfigureAwait(false);
         }
