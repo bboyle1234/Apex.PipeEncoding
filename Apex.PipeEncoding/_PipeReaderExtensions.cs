@@ -38,20 +38,26 @@ namespace Apex.PipeEncoding {
             if (readTask.IsCompleted) {
                 var readResult = readTask.Result; /// Can only get the Result property once for a ValueTask.
                 if (readResult.IsCanceled) throw new OperationCanceledException();
-                if (readResult.Buffer.Length >= minBufferLength) {
+                var buffer = readResult.Buffer;
+                if (buffer.Length >= minBufferLength) {
                     return new ValueTask<ReadResult>(readResult);
                 }
+                reader.AdvanceTo(buffer.Start, buffer.End);
+                return SlowReadAsync(reader, minBufferLength, null);
             }
 
             /// Cannot pass the readTask above into the "slowread" method because we may have already 
             /// examined its Result property. (Value tasks can only be awaited or examined once)
             /// On the bright side, because we did not advance the reader, the first call to reader.ReadAsync
             /// in the method below will return immediately, so there's no loss in performance.
-            return SlowReadAsync(reader, minBufferLength);
+            return SlowReadAsync(reader, minBufferLength, readTask);
 
 
-            static async ValueTask<ReadResult> SlowReadAsync(PipeReader reader, int minBufferLength) {
-                var readResult = await reader.ReadAsync().ConfigureAwait(false);
+            static async ValueTask<ReadResult> SlowReadAsync(PipeReader reader, int minBufferLength, ValueTask<ReadResult>? readTask) {
+                if (!readTask.HasValue) {
+                    readTask = reader.ReadAsync(default);
+                }
+                var readResult = await readTask.Value.ConfigureAwait(false);
                 var buffer = readResult.Buffer;
                 while (buffer.Length < minBufferLength) {
                     if (readResult.IsCompleted) throw new IOException("Reader is completed.");
