@@ -38,7 +38,7 @@ namespace Apex.PipeEncoding {
         static ulong Convert(long value) => (uint)((value << 1) ^ (value >> 63));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static long Convert(ulong value) => (int)((value >> 1) ^ (~(value & 1) + 1));
+        static long Convert(ulong value) => (long)((value >> 1) ^ (~(value & 1) + 1));
 
 
         public static void WriteNullableLong(this PipeWriter writer, long? value) {
