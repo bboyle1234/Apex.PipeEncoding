@@ -47,7 +47,7 @@ namespace Apex.PipeEncoding {
                 }
             }
 
-            static bool ProcessResult(PipeReader reader, ReadResult readResult, ref uint result, ref int shiftBits) {
+            static bool ProcessResult(PipeReader reader, in ReadResult readResult, ref uint result, ref int shiftBits) {
                 var bytesRead = 0;
                 if (readResult.IsCanceled) throw new OperationCanceledException();
                 var buffer = readResult.Buffer;

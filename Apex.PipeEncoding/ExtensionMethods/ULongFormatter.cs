@@ -47,7 +47,7 @@ namespace Apex.PipeEncoding {
                 }
             }
 
-            static bool ProcessResult(PipeReader reader, ReadResult readResult, ref ulong result, ref int shiftBits) {
+            static bool ProcessResult(PipeReader reader, in ReadResult readResult, ref ulong result, ref int shiftBits) {
                 var bytesRead = 0;
                 if (readResult.IsCanceled) throw new OperationCanceledException();
                 var buffer = readResult.Buffer;
@@ -56,7 +56,7 @@ namespace Apex.PipeEncoding {
                     var span = segment.Span;
                     for (var i = 0; i < span.Length; i++) {
                         bytesRead++;
-                        var inputByte = (uint)span[i];
+                        var inputByte = (ulong)span[i];
                         if ((inputByte & LAST_BYTE) == LAST_BYTE) {
                             reader.AdvanceTo(buffer.GetPosition(bytesRead));
                             result += ((inputByte & DATA_MASK) << shiftBits);
