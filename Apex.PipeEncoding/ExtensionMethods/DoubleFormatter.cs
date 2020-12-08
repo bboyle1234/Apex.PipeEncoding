@@ -17,7 +17,7 @@ namespace Apex.PipeEncoding {
         }
 
         public static ValueTask<double> ReadDouble(this PipeReader reader) {
-            var readTask = reader.ReadAsync(minBufferLength: 8);
+            var readTask = reader.ReadMinLengthAsync(minBufferLength: 8);
             if (readTask.IsCompleted) {
                 var buffer = readTask.Result.Buffer;
                 return new ValueTask<double>(ReadFromBuffer(reader, buffer));

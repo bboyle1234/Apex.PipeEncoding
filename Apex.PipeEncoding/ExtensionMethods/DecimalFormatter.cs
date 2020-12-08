@@ -36,7 +36,7 @@ namespace Apex.PipeEncoding {
 
         public static async ValueTask<decimal> ReadDecimalFromString(this PipeReader reader) {
             var numBytes = (int)await reader.ReadUInt().ConfigureAwait(false);
-            var readResult = await reader.ReadAsync(minBufferLength: numBytes).ConfigureAwait(false);
+            var readResult = await reader.ReadMinLengthAsync(minBufferLength: numBytes).ConfigureAwait(false);
             return ReadFromBuffer(reader, numBytes, readResult.Buffer);
 
             static decimal ReadFromBuffer(PipeReader reader, int numBytes, ReadOnlySequence<byte> buffer) {

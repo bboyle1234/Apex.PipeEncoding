@@ -31,7 +31,7 @@ namespace Apex.PipeEncoding {
             if (!await reader.ReadBool().ConfigureAwait(false)) return null;
             var byteCount = (int)await reader.ReadUInt().ConfigureAwait(false);
             if (byteCount == 0) return string.Empty;
-            var readResult = await reader.ReadAsync(minBufferLength: byteCount).ConfigureAwait(false);
+            var readResult = await reader.ReadMinLengthAsync(minBufferLength: byteCount).ConfigureAwait(false);
             var buffer = readResult.Buffer;
             var result = ReadString(buffer, byteCount);
             reader.AdvanceTo(buffer.GetPosition(byteCount));

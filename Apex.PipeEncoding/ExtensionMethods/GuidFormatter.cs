@@ -18,7 +18,7 @@ namespace Apex.PipeEncoding {
         }
 
         public static ValueTask<Guid> ReadGuid(this PipeReader reader) {
-            var readTask = reader.ReadAsync(minBufferLength: 16);
+            var readTask = reader.ReadMinLengthAsync(minBufferLength: 16);
             if (readTask.IsCompleted) {
                 var readResult = readTask.Result;
                 var buffer = readResult.Buffer;
