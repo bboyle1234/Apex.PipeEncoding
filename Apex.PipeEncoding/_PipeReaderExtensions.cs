@@ -28,6 +28,7 @@ namespace Apex.PipeEncoding {
                     return new ValueTask<ReadResult>(readResult);
                 }
 
+                if (readResult.IsCompleted) throw new IOException("Reader is completed.");
                 // fall back to asynchronous completion
                 reader.AdvanceTo(buffer.Start, buffer.End); // it is required to call "AdvanceTo" before calling "ReadAsync" again
                 return SlowReadAsync(reader, minBufferLength, cancellationToken, reader.ReadAsync(cancellationToken));
