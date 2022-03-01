@@ -1,4 +1,4 @@
-using Apex.TimeStamps;
+using FFT.TimeStamps;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO.Pipelines;
 using System.Threading.Tasks;
@@ -68,7 +68,7 @@ namespace Apex.PipeEncoding.Tests {
                 var time = startTime;
                 for (var i = 0; i < 100000; i++) {
                     writer.WriteTimeStamp(time);
-                    time = time.AddAbsoluteHours(21.65438);
+                    time = time.AddHours(21.65438);
                 }
                 await writer.FlushAsync().ConfigureAwait(false);
             });
@@ -77,7 +77,7 @@ namespace Apex.PipeEncoding.Tests {
                 var time = startTime;
                 for (var i = 0; i < 100000; i++) {
                     Assert.AreEqual(time, await reader.ReadTimeStamp().ConfigureAwait(false));
-                    time = time.AddAbsoluteHours(21.65438);
+                    time = time.AddHours(21.65438);
                 }
             });
 

@@ -51,5 +51,37 @@ namespace Apex.PipeEncoding {
                 return readResult;
             }
         }
+
+
+        public static ValueTask<(bool, ReadResult)> ReadMinLengthAsync2(this PipeReader reader, int minBufferLength, CancellationToken cancellationToken = default) {
+
+            var task = reader.ReadAsync(cancellationToken);
+            if (task.IsCompleted) {
+                var result = task.Result;
+                if (result.IsCanceled) throw new OperationCanceledException(cancellationToken);
+                var buffer = result.Buffer;
+                if (buffer.Length >= minBufferLength)
+                    return new ValueTask<(bool, ReadResult)>((true, result));
+                if (result.IsCompleted)
+                    return new ValueTask<(bool, ReadResult)>((false, new ReadResult()));
+                reader.AdvanceTo(buffer.Start, buffer.End);
+                return SlowReadAsync(reader, minBufferLength, cancellationToken, reader.ReadAsync(cancellationToken));
+            }
+
+            return SlowReadAsync(reader, minBufferLength, cancellationToken, task);
+
+            static async ValueTask<(bool, ReadResult)> SlowReadAsync(PipeReader reader, int minBufferLength, CancellationToken cancellationToken, ValueTask<ReadResult> task) {
+                var result = await task.ConfigureAwait(false);
+                var buffer = result.Buffer;
+                while(buffer.Length < minBufferLength) {
+                    if (result.IsCanceled)
+                        throw new OperationCanceledException(cancellationToken);
+                    if (result.IsCompleted)
+                        return (false, new ReadResult());
+
+                }
+                return (true, result);
+            }
+        }
     }
 }
